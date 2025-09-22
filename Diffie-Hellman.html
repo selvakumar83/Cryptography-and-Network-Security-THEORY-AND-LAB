@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Diffie-Hellman Key Exchange (Demo)</title>
+  <style>
+    body{font-family:Arial, sans-serif;margin:20px;background:#f0f4f9;color:#222}
+    .card{background:white;border-radius:10px;padding:16px;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+    label{display:block;margin-top:10px;font-weight:bold}
+    input,select,button,textarea{font-size:14px;padding:8px;margin-top:5px;border-radius:6px;border:1px solid #ccc;width:100%}
+    button{cursor:pointer;background:#2b6cb0;color:white;border:none}
+    button:hover{background:#2c5282}
+    pre{background:#1a202c;color:#edf2f7;padding:12px;border-radius:6px;white-space:pre-wrap}
+  </style>
+</head>
+<body>
+  <h2>Diffie–Hellman Key Exchange (HTML + JavaScript)</h2>
+  <div class="card">
+    <label>Prime p</label>
+    <input id="primeInput" value="23" />
+
+    <label>Generator g</label>
+    <input id="genInput" value="5" />
+
+    <label>Alice private key (a)</label>
+    <input id="alicePriv" value="6" />
+
+    <label>Bob private key (b)</label>
+    <input id="bobPriv" value="15" />
+
+    <button id="compute">Compute Keys and Shared Secret</button>
+  </div>
+
+  <div class="card">
+    <h3>Results</h3>
+    <pre id="output">(not computed yet)</pre>
+  </div>
+
+<script>
+function modPow(base, exp, mod){
+  base = BigInt(base);
+  exp = BigInt(exp);
+  mod = BigInt(mod);
+  let result = 1n;
+  base = base % mod;
+  while(exp > 0n){
+    if(exp % 2n === 1n) result = (result * base) % mod;
+    exp = exp / 2n;
+    base = (base * base) % mod;
+  }
+  return result;
+}
+
+document.getElementById('compute').addEventListener('click', ()=>{
+  let p = BigInt(document.getElementById('primeInput').value);
+  let g = BigInt(document.getElementById('genInput').value);
+  let a = BigInt(document.getElementById('alicePriv').value);
+  let b = BigInt(document.getElementById('bobPriv').value);
+
+  // Compute public keys
+  let A = modPow(g, a, p); // Alice public
+  let B = modPow(g, b, p); // Bob public
+
+  // Compute shared secret
+  let sAlice = modPow(B, a, p);
+  let sBob = modPow(A, b, p);
+
+  let output = "Prime p = " + p + "\n";
+  output += "Generator g = " + g + "\n\n";
+  output += "Alice private key (a) = " + a + "\n";
+  output += "Bob private key (b) = " + b + "\n\n";
+  output += "Alice public key (A = g^a mod p) = " + A + "\n";
+  output += "Bob public key (B = g^b mod p) = " + B + "\n\n";
+  output += "Shared secret (Alice) = B^a mod p = " + sAlice + "\n";
+  output += "Shared secret (Bob) = A^b mod p = " + sBob + "\n";
+  output += "\nShared secret equal? " + (sAlice === sBob);
+
+  document.getElementById('output').textContent = output;
+});
+</script>
+</body>
+</html>
