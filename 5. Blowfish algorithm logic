@@ -1,0 +1,30 @@
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+import java.util.Scanner;
+
+public class BlowfishExample {
+    public static void main(String[] args) throws Exception {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter plaintext: ");
+        String plaintext = sc.nextLine();
+
+        System.out.print("Enter key (4-56 bytes): ");
+        String keyInput = sc.nextLine();
+        byte[] keyBytes = keyInput.getBytes();
+        SecretKeySpec key = new SecretKeySpec(keyBytes, "Blowfish");
+
+        Cipher cipher = Cipher.getInstance("Blowfish/ECB/PKCS5Padding");
+
+        // Encryption
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        String encrypted = Base64.getEncoder().encodeToString(cipher.doFinal(plaintext.getBytes()));
+        System.out.println("Encrypted Text: " + encrypted);
+
+        // Decryption
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(encrypted));
+        System.out.println("Decrypted Text: " + new String(decrypted));
+    }
+}
